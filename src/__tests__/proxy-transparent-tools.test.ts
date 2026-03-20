@@ -176,12 +176,11 @@ describe("Phase 2: Message format preservation", () => {
     }))
     await response.json()
 
-    // The prompt should include the system context
+    // System prompt should be passed via appendSystemPrompt, not merged into prompt
     expect(capturedQueryParams).toBeDefined()
-    const prompt = capturedQueryParams.prompt
-    expect(typeof prompt).toBe("string")
-    // System prompt should be part of the prompt sent to SDK
-    expect(prompt).toContain("You are a helpful assistant.")
+    expect(capturedQueryParams.options.appendSystemPrompt).toContain("You are a helpful assistant.")
+    // The prompt should NOT contain the system prompt (it's separate now)
+    expect(capturedQueryParams.prompt).not.toContain("You are a helpful assistant.")
   })
 
   it("should include tool_result content in the prompt sent to SDK", async () => {
