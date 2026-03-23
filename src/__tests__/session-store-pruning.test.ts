@@ -18,7 +18,7 @@ describe("Session store count-based pruning", () => {
   const originalMax = process.env.CLAUDE_PROXY_MAX_STORED_SESSIONS
 
   beforeEach(() => {
-    // Mock Date.now() to return monotonically increasing values so that
+    // Mock Date.now() to return increasing values so that
     // lastUsedAt ordering is deterministic even when the loop runs in <1ms
     // (which happens on fast CI runners).
     let now = 1_000_000
