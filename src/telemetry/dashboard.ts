@@ -109,18 +109,19 @@ function pctRow(label, color, phase) {
 async function refresh() {
   const w = $('#window').value;
   try {
-    const [summary, reqs] = await Promise.all([
+    const [summary, reqs, logs] = await Promise.all([
       fetch('/telemetry/summary?window=' + w).then(r => r.json()),
       fetch('/telemetry/requests?limit=50&since=' + (Date.now() - Number(w))).then(r => r.json()),
+      fetch('/telemetry/logs?limit=100&since=' + (Date.now() - Number(w))).then(r => r.json()),
     ]);
-    render(summary, reqs);
+    render(summary, reqs, logs);
     $('#lastUpdate').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch (e) {
     $('#content').innerHTML = '<div class="empty">Failed to load telemetry</div>';
   }
 }
 
-function render(s, reqs) {
+function render(s, reqs, logs) {
   if (s.totalRequests === 0) {
     $('#content').innerHTML = '<div class="empty">No requests recorded yet. Send a request through the proxy to see telemetry.</div>';
     return;
@@ -201,6 +202,27 @@ function render(s, reqs) {
       + '</tr>';
   }
   html += '</tbody></table></div>';
+
+  // Diagnostic logs panel
+  if (logs && logs.length > 0) {
+    html += '<div class="section"><div class="section-title">Diagnostic Logs</div>'
+      + '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:400px;overflow-y:auto">'
+      + '<table style="width:100%;font-size:12px"><thead><tr>'
+      + '<th style="width:70px">Time</th><th style="width:60px">Level</th><th style="width:70px">Category</th><th>Message</th>'
+      + '</tr></thead><tbody>';
+
+    for (const log of logs) {
+      const levelColor = {info:'var(--green)',warn:'var(--yellow)',error:'var(--red)'}[log.level] || 'var(--muted)';
+      const catColor = {session:'var(--blue)',lineage:'var(--purple)',error:'var(--red)',lifecycle:'var(--muted)'}[log.category] || 'var(--muted)';
+      html += '<tr>'
+        + '<td class="mono">' + ago(log.timestamp) + '</td>'
+        + '<td><span style="color:' + levelColor + '">' + log.level + '</span></td>'
+        + '<td><span style="color:' + catColor + '">' + log.category + '</span></td>'
+        + '<td class="mono" style="word-break:break-all">' + log.message + '</td>'
+        + '</tr>';
+    }
+    html += '</tbody></table></div></div>';
+  }
 
   $('#content').innerHTML = html;
 }
