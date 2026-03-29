@@ -182,6 +182,19 @@ cline --yolo --model claude-haiku-4-5-20251001 "quick question"  # haiku (fastes
 
 No adapter or plugin needed — Cline uses the standard Anthropic SDK and falls through to the default adapter. All models (Sonnet 4.6, Opus 4.6, Haiku 4.5) route to their correct Claude Max tiers automatically.
 
+### Aider
+
+Aider works out of the box — no plugin or config file needed:
+
+```bash
+ANTHROPIC_API_KEY=x ANTHROPIC_BASE_URL=http://127.0.0.1:3456 \
+  aider --model anthropic/claude-sonnet-4-5-20250929
+```
+
+All standard aider features work: file editing, repo-map, git integration, multi-file changes.
+
+> **Note:** Aider's `--no-stream` flag is incompatible due to a litellm parsing issue — use the default streaming mode (no flag needed).
+
 ### Any Anthropic-compatible tool
 
 ```bash
@@ -199,7 +212,7 @@ export ANTHROPIC_BASE_URL=http://127.0.0.1:3456
 | [Crush](https://github.com/charmbracelet/crush) | ✅ Verified | Provider config (see setup above) | Full tool support, session resume, streaming, headless `crush run` |
 | [Cline](https://github.com/cline/cline) | ✅ Verified | Config (see setup above) | Full tool support, file read/write/edit, bash, session resume, all models |
 | [Continue](https://github.com/continuedev/continue) | 🔲 Untested | — | Should work — standard Anthropic API |
-| [Aider](https://github.com/paul-gauthier/aider) | 🔲 Untested | — | Should work — standard Anthropic API |
+| [Aider](https://github.com/paul-gauthier/aider) | ✅ Verified | Env vars (see setup above) | File editing, streaming; `--no-stream` broken (litellm bug) |
 
 Tested an agent or built a plugin? [Open an issue](https://github.com/rynfar/meridian/issues) and we'll add it.
 
